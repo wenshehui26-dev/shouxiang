@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>命纹 · AI手相解读</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#C9973A;--gold-light:#E8C87A;--ink:#0A0A0C;
+  --surface:#121218;--card:#1A1A22;--card2:#222230;
+  --border:rgba(201,151,58,0.2);--border2:rgba(201,151,58,0.4);
+  --text:#EDE8DF;--muted:#7A7468;
+}
+html,body{background:var(--ink);color:var(--text);font-family:'Noto Sans SC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 50% -10%,rgba(180,120,30,0.12) 0%,transparent 70%)}
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 0 4rem}
+
+/* HERO */
+.hero{text-align:center;padding:3rem 1.5rem 2rem}
+.hero-emblem{width:80px;height:80px;margin:0 auto 1.25rem;border:1px solid rgba(201,151,58,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;position:relative;animation:breathe 4s ease-in-out infinite}
+.hero-emblem::before{content:'';position:absolute;inset:5px;border:0.5px solid rgba(201,151,58,0.2);border-radius:50%}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(201,151,58,0)}50%{box-shadow:0 0 24px 4px rgba(201,151,58,0.12)}}
+.hero-title{font-family:'Noto Serif SC',serif;font-size:2.2rem;font-weight:300;color:var(--gold-light);letter-spacing:0.15em;margin-bottom:0.4rem}
+.hero-sub{font-size:0.75rem;letter-spacing:0.25em;color:var(--muted);text-transform:uppercase;margin-bottom:1rem}
+.hero-desc{font-size:0.88rem;line-height:1.8;color:rgba(237,232,223,0.7);max-width:300px;margin:0 auto}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:0.8rem;padding:0 1.5rem;margin:1.25rem 0}
+.divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--border)}
+.divider span{font-size:0.65rem;letter-spacing:0.25em;color:var(--gold);white-space:nowrap}
+
+/* FEATURES */
+.features{display:flex;justify-content:center;gap:1.5rem;padding:0 1.5rem;margin-bottom:1.75rem}
+.feat{text-align:center}
+.feat-icon{font-size:1.4rem;margin-bottom:0.3rem}
+.feat-label{font-size:0.68rem;color:var(--muted)}
+
+/* KEY SETUP */
+.key-setup{margin:0 1.25rem 1.25rem;background:var(--card);border:0.5px solid var(--border2);border-radius:14px;padding:1.25rem}
+.key-title{font-size:0.78rem;color:var(--gold);letter-spacing:0.1em;margin-bottom:0.75rem}
+.key-input-row{display:flex;gap:0.5rem}
+.key-input{
+  flex:1;background:rgba(255,255,255,0.04);
+  border:0.5px solid rgba(255,255,255,0.12);
+  border-radius:8px;padding:0.7rem 0.85rem;
+  color:var(--text);font-size:0.78rem;font-family:'Noto Sans SC',sans-serif;
+  outline:none;
+}
+.key-input:focus{border-color:var(--border2)}
+.key-input::placeholder{color:var(--muted)}
+.btn-save-key{
+  padding:0.7rem 1rem;
+  background:rgba(201,151,58,0.15);
+  border:0.5px solid var(--border2);
+  border-radius:8px;color:var(--gold-light);
+  font-size:0.78rem;cursor:pointer;white-space:nowrap;
+}
+.btn-save-key:active{background:rgba(201,151,58,0.25)}
+.key-status{font-size:0.72rem;color:var(--muted);margin-top:0.5rem}
+.key-status.ok{color:#7EC897}
+
+/* SECTION */
+.section{padding:0 1.25rem;margin-bottom:1.25rem}
+.section-title{font-size:0.7rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:0.9rem;display:flex;align-items:center;gap:0.6rem}
+.section-title::after{content:'';flex:1;height:0.5px;background:var(--border)}
+
+/* UPLOAD */
+.upload-zone{border:1px dashed rgba(201,151,58,0.3);border-radius:16px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all 0.25s;background:rgba(255,255,255,0.015);position:relative;overflow:hidden}
+.upload-zone:active{background:rgba(201,151,58,0.05)}
+.upload-zone.has-img{padding:0;border-style:solid;border-color:var(--border2)}
+#fileInput{display:none}
+.upload-icon-wrap{width:64px;height:64px;margin:0 auto 1rem;border:1px solid rgba(201,151,58,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px}
+.upload-title{font-family:'Noto Serif SC',serif;font-size:1.05rem;color:var(--gold-light);margin-bottom:0.5rem}
+.upload-hint{font-size:0.78rem;color:var(--muted);line-height:1.7}
+.upload-tips{display:flex;gap:0.5rem;margin-top:0.85rem;flex-wrap:wrap;justify-content:center}
+.tip-tag{font-size:0.68rem;color:var(--muted);background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:20px;padding:0.2rem 0.65rem}
+#preview{width:100%;max-height:380px;object-fit:cover;border-radius:15px;display:none}
+
+/* BTN */
+.btn-main{width:calc(100% - 2.5rem);margin:0 1.25rem;padding:1rem;background:linear-gradient(135deg,rgba(201,151,58,0.22),rgba(201,151,58,0.1));border:0.5px solid rgba(201,151,58,0.5);border-radius:12px;color:var(--gold-light);font-family:'Noto Sans SC',sans-serif;font-size:1rem;font-weight:400;letter-spacing:0.12em;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.6rem}
+.btn-main:active{transform:scale(0.98)}
+.btn-main:disabled{opacity:0.35;cursor:not-allowed}
+
+/* LOADING */
+#loadingState{display:none;text-align:center;padding:3rem 1.5rem}
+.loading-ring{width:56px;height:56px;margin:0 auto 1.25rem;border:1.5px solid rgba(201,151,58,0.15);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-title{font-family:'Noto Serif SC',serif;font-size:1.1rem;color:var(--gold-light);margin-bottom:0.4rem}
+.loading-sub{font-size:0.75rem;color:var(--muted);line-height:2}
+
+/* RESULT */
+#resultBlock{display:none;padding:0 1.25rem;animation:fadeUp 0.5s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.result-header{background:var(--card);border:0.5px solid var(--border2);border-radius:16px;padding:1.5rem;margin-bottom:1rem;text-align:center}
+.fate-badge{display:inline-block;background:rgba(201,151,58,0.12);border:0.5px solid var(--border2);border-radius:20px;padding:0.3rem 1rem;font-size:0.7rem;letter-spacing:0.15em;color:var(--gold);margin-bottom:0.75rem}
+.fate-type{font-family:'Noto Serif SC',serif;font-size:1.5rem;color:var(--gold-light);margin-bottom:0.5rem;letter-spacing:0.08em}
+.fate-desc{font-size:0.83rem;color:rgba(237,232,223,0.7);line-height:1.8}
+.lines-card{background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1rem}
+.card-label{font-size:0.65rem;letter-spacing:0.2em;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
+.card-label::after{content:'';flex:1;height:0.5px;background:var(--border)}
+.line-row{display:flex;gap:0.85rem;padding:0.85rem 0;border-bottom:0.5px solid rgba(255,255,255,0.05)}
+.line-row:last-child{border-bottom:none}
+.line-symbol{width:36px;height:36px;flex-shrink:0;border:0.5px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gold);background:rgba(201,151,58,0.06)}
+.line-name{font-size:0.78rem;color:var(--gold);margin-bottom:0.25rem}
+.line-text{font-size:0.84rem;color:var(--text);line-height:1.75}
+
+/* PAYWALL */
+.paywall-card{background:var(--card);border:1px solid rgba(201,151,58,0.35);border-radius:16px;padding:1.5rem;margin-bottom:1rem;position:relative;overflow:hidden}
+.paywall-title{font-family:'Noto Serif SC',serif;font-size:1.1rem;color:var(--gold-light);margin-bottom:0.4rem}
+.paywall-desc{font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+.paywall-item{display:flex;align-items:center;gap:0.6rem;font-size:0.82rem;color:var(--text);padding:0.3rem 0}
+.paywall-item::before{content:'✦';font-size:0.55rem;color:var(--gold);flex-shrink:0}
+.blur-preview{filter:blur(5px);background:rgba(255,255,255,0.03);border-radius:8px;padding:0.75rem;font-size:0.82rem;line-height:1.8;color:var(--muted);margin:1rem 0;user-select:none}
+.btn-unlock{width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--gold),#A07020);border:none;border-radius:10px;color:#1A0F00;font-family:'Noto Sans SC',sans-serif;font-size:0.95rem;font-weight:500;letter-spacing:0.08em;cursor:pointer}
+.price-note{text-align:center;font-size:0.72rem;color:var(--muted);margin-top:0.6rem}
+
+/* QUOTE */
+.quote-card{background:var(--card2);border:0.5px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem;text-align:center}
+.quote-text{font-family:'Noto Serif SC',serif;font-size:1.05rem;font-style:italic;color:var(--gold-light);line-height:1.8;margin-bottom:0.5rem}
+.quote-attr{font-size:0.7rem;color:var(--muted);letter-spacing:0.1em}
+
+/* SHARE */
+.share-section{background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1rem;text-align:center}
+.share-title{font-size:0.85rem;color:var(--text);margin-bottom:0.3rem}
+.share-hint{font-size:0.75rem;color:var(--muted);margin-bottom:1rem;line-height:1.6}
+.share-btns{display:flex;gap:0.75rem}
+.btn-share{flex:1;padding:0.7rem;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text);font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.4rem}
+.btn-again{width:100%;margin-top:0.75rem;padding:0.75rem;background:transparent;border:0.5px solid var(--border);border-radius:10px;color:var(--gold);font-size:0.85rem;cursor:pointer}
+
+/* TRUST */
+.trust-strip{display:flex;justify-content:center;gap:2rem;padding:1.5rem;margin-top:0.5rem}
+.trust-item{text-align:center}
+.trust-num{font-family:'Noto Serif SC',serif;font-size:1.3rem;color:var(--gold-light)}
+.trust-label{font-size:0.68rem;color:var(--muted)}
+
+/* FOOTER */
+.footer{text-align:center;padding:1rem 1.5rem;font-size:0.68rem;color:var(--muted);line-height:1.8}
+
+/* ERROR */
+.err-box{background:rgba(212,97,74,0.1);border:0.5px solid rgba(212,97,74,0.4);border-radius:10px;padding:1rem;font-size:0.82rem;color:#F09595;line-height:1.7;margin:1rem 1.25rem;display:none}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-emblem">🤲</div>
+    <h1 class="hero-title">命 纹</h1>
+    <p class="hero-sub">AI · 手相解读</p>
+    <p class="hero-desc">你的手掌藏着命运的密码<br>上传手掌照片，AI 为你深度解读</p>
+  </div>
+
+  <div class="divider"><span>免费体验完整解读</span></div>
+
+  <!-- API KEY 输入框 -->
+  <div class="key-setup" id="keySetup">
+    <div class="key-title">⚙️ 首次使用：填入 Anthropic API Key</div>
+    <div class="key-input-row">
+      <input class="key-input" id="keyInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off">
+      <button class="btn-save-key" onclick="saveKey()">保存</button>
+    </div>
+    <div class="key-status" id="keyStatus">Key 保存在本地浏览器，不会上传</div>
+  </div>
+
+  <div class="features">
+    <div class="feat"><div class="feat-icon">〰️</div><div class="feat-label">生命线</div></div>
+    <div class="feat"><div class="feat-icon">♡</div><div class="feat-label">感情线</div></div>
+    <div class="feat"><div class="feat-icon">◇</div><div class="feat-label">智慧线</div></div>
+    <div class="feat"><div class="feat-icon">💰</div><div class="feat-label">财运</div></div>
+    <div class="feat"><div class="feat-icon">✨</div><div class="feat-label">桃花运</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">上传手掌照片</div>
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+      <div id="placeholder">
+        <div class="upload-icon-wrap">🤲</div>
+        <div class="upload-title">点击拍摄 / 选择图片</div>
+        <div class="upload-hint">展开右手掌心，光线充足<br>手纹清晰可见效果最佳</div>
+        <div class="upload-tips">
+          <span class="tip-tag">自然光最佳</span>
+          <span class="tip-tag">手掌充满画面</span>
+          <span class="tip-tag">五指微张</span>
+        </div>
+      </div>
+      <img id="preview" alt="手掌预览">
+    </div>
+    <input type="file" id="fileInput" accept="image/*">
+  </div>
+
+  <div class="err-box" id="errBox"></div>
+
+  <button class="btn-main" id="btnAnalyze" disabled onclick="startAnalysis()">
+    ✦ &nbsp;开始解读我的命运
+  </button>
+
+  <div id="loadingState">
+    <div class="loading-ring"></div>
+    <div class="loading-title">正在感知手纹能量…</div>
+    <div class="loading-sub" id="loadingStep">识别手纹特征</div>
+  </div>
+
+  <div id="resultBlock">
+    <div class="result-header">
+      <div class="fate-badge">命格解读</div>
+      <div class="fate-type" id="fateType">—</div>
+      <div class="fate-desc" id="fateDesc">—</div>
+    </div>
+
+    <div class="lines-card">
+      <div class="card-label">四大主线</div>
+      <div class="line-row">
+        <div class="line-symbol">〰</div>
+        <div><div class="line-name">生命线</div><div class="line-text" id="lifeLine">—</div></div>
+      </div>
+      <div class="line-row">
+        <div class="line-symbol">♡</div>
+        <div><div class="line-name">感情线</div><div class="line-text" id="heartLine">—</div></div>
+      </div>
+      <div class="line-row">
+        <div class="line-symbol">◇</div>
+        <div><div class="line-name">智慧线</div><div class="line-text" id="headLine">—</div></div>
+      </div>
+      <div class="line-row">
+        <div class="line-symbol">|</div>
+        <div><div class="line-name">命运线</div><div class="line-text" id="fateLine">—</div></div>
+      </div>
+    </div>
+
+    <div class="paywall-card">
+      <div class="paywall-title">🔒 完整深度报告</div>
+      <div class="paywall-desc">四大主线已解读，解锁获得更深层洞察：</div>
+      <div class="paywall-item">职业天赋 · 最适合你的3个方向</div>
+      <div class="paywall-item">隐藏性格 · 别人看不穿的你</div>
+      <div class="paywall-item">财运详析 · 财富积累的关键时机</div>
+      <div class="paywall-item">桃花运 · 感情走势与缘分预测</div>
+      <div class="blur-preview">【职业天赋】此命格天生具备极强感知力，适合从事…<br>【财运】近期财星入位，注意…方位有利…<br>【桃花】感情线走势显示…今年…月前后…</div>
+      <button class="btn-unlock" onclick="handleUnlock()">解锁完整报告 · ¥9.9</button>
+      <div class="price-note">一次性付费 · 永久查看 · 支持微信 / 支付宝</div>
+    </div>
+
+    <div class="quote-card">
+      <div class="quote-text" id="quoteText">"命由己造，相由心生"</div>
+      <div class="quote-attr">— 大师箴言</div>
+    </div>
+
+    <div class="share-section">
+      <div class="share-title">你的命格解读出来了 👀</div>
+      <div class="share-hint">发给朋友，看看他们的手相有什么不同</div>
+      <div class="share-btns">
+        <button class="btn-share" onclick="handleShare()">📤 分享结果</button>
+        <button class="btn-share" onclick="handleCopy()">🔗 复制链接</button>
+      </div>
+      <button class="btn-again" onclick="resetAll()">↩ 重新上传手掌</button>
+    </div>
+  </div>
+
+  <div class="trust-strip">
+    <div class="trust-item"><div class="trust-num">98%</div><div class="trust-label">用户认可度</div></div>
+    <div class="trust-item"><div class="trust-num">3万+</div><div class="trust-label">已测人数</div></div>
+    <div class="trust-item"><div class="trust-num">AI驱动</div><div class="trust-label">Claude 大模型</div></div>
+  </div>
+
+  <div class="footer">
+    命纹 · AI手相解读 &nbsp;|&nbsp; Powered by Claude<br>
+    解读结果仅供娱乐参考，请理性看待
+  </div>
+</div>
+
+<script>
+let imageBase64 = null;
+
+// 初始化：读取已保存的 Key
+window.onload = function() {
+  const saved = localStorage.getItem('palmApiKey');
+  if (saved) {
+    document.getElementById('keyInput').value = saved;
+    document.getElementById('keyStatus').textContent = '✓ Key 已保存，可直接使用';
+    document.getElementById('keyStatus').className = 'key-status ok';
+  }
+};
+
+function saveKey() {
+  const val = document.getElementById('keyInput').value.trim();
+  if (!val.startsWith('sk-ant-')) {
+    document.getElementById('keyStatus').textContent = '⚠️ Key 格式不对，应以 sk-ant- 开头';
+    document.getElementById('keyStatus').className = 'key-status';
+    return;
+  }
+  localStorage.setItem('palmApiKey', val);
+  document.getElementById('keyStatus').textContent = '✓ Key 已保存，开始上传手掌吧';
+  document.getElementById('keyStatus').className = 'key-status ok';
+}
+
+function getApiKey() {
+  return localStorage.getItem('palmApiKey') || document.getElementById('keyInput').value.trim();
+}
+
+// 上传图片
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const src = ev.target.result;
+    imageBase64 = src.split(',')[1];
+    const preview = document.getElementById('preview');
+    preview.src = src;
+    preview.style.display = 'block';
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('uploadZone').classList.add('has-img');
+    document.getElementById('btnAnalyze').disabled = false;
+    document.getElementById('errBox').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+async function startAnalysis() {
+  const apiKey = getApiKey();
+  if (!apiKey || !apiKey.startsWith('sk-ant-')) {
+    showErr('请先填写并保存 API Key（以 sk-ant- 开头）');
+    return;
+  }
+  if (!imageBase64) return;
+
+  document.getElementById('btnAnalyze').style.display = 'none';
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('resultBlock').style.display = 'none';
+  document.getElementById('errBox').style.display = 'none';
+
+  const steps = ['识别手纹特征…','分析四大主线…','推算命格类型…','整合解读报告…'];
+  let si = 0;
+  const t = setInterval(() => {
+    si = (si+1) % steps.length;
+    document.getElementById('loadingStep').textContent = steps[si];
+  }, 1400);
+
+  const prompt = `你是融合东方传统手相学与现代心理学的AI手相大师，语言神秘有温度。请分析这张手掌图片，直接返回JSON（不要markdown代码块）：
+{"fateType":"命格类型4-8字","fateDesc":"命格总体描述50字内","lifeLine":"生命线解读55字内","heartLine":"感情线解读55字内","headLine":"智慧线解读55字内","fateLine":"命运线解读55字内","advice":"大师箴言18字内"}`;
+
+  try {
+    const resp = await fetch('https://api.yizhige.top/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            {type:'image',source:{type:'base64',media_type:'image/jpeg',data:imageBase64}},
+            {type:'text',text:prompt}
+          ]
+        }]
+      })
+    });
+
+    clearInterval(t);
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      const msg = err.error?.message || `请求失败 (${resp.status})`;
+      if (resp.status === 401) throw new Error('API Key 无效或已过期，请重新生成一个');
+      throw new Error(msg);
+    }
+
+    const data = await resp.json();
+    const raw = data.content?.find(b => b.type === 'text')?.text || '';
+    let json;
+    try {
+      json = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    } catch {
+      const m = raw.match(/\{[\s\S]*\}/);
+      if (m) json = JSON.parse(m[0]);
+      else throw new Error('解析失败，请重试');
+    }
+    renderResult(json);
+
+  } catch(e) {
+    clearInterval(t);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('btnAnalyze').style.display = 'flex';
+    document.getElementById('btnAnalyze').disabled = false;
+    showErr('解读失败：' + e.message);
+  }
+}
+
+function renderResult(d) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('fateType').textContent = d.fateType || '—';
+  document.getElementById('fateDesc').textContent = d.fateDesc || '—';
+  document.getElementById('lifeLine').textContent = d.lifeLine || '—';
+  document.getElementById('heartLine').textContent = d.heartLine || '—';
+  document.getElementById('headLine').textContent = d.headLine || '—';
+  document.getElementById('fateLine').textContent = d.fateLine || '—';
+  document.getElementById('quoteText').textContent = `"${d.advice || '命由己造，相由心生'}"`;
+  document.getElementById('resultBlock').style.display = 'block';
+  document.getElementById('resultBlock').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function showErr(msg) {
+  const el = document.getElementById('errBox');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function handleUnlock() {
+  alert('支付功能开发中\n接入微信支付 / 支付宝后上线');
+}
+
+function handleShare() {
+  if (navigator.share) {
+    navigator.share({title:'命纹·AI手相解读',text:'我的手相解读太准了，你也来测一下！',url:location.href});
+  } else { handleCopy(); alert('链接已复制，去粘贴分享吧！'); }
+}
+
+function handleCopy() {
+  navigator.clipboard?.writeText(location.href).then(() => alert('链接已复制 ✓')).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = location.href;
+    document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+    alert('链接已复制 ✓');
+  });
+}
+
+function resetAll() {
+  document.getElementById('preview').style.display = 'none';
+  document.getElementById('preview').src = '';
+  document.getElementById('placeholder').style.display = 'block';
+  document.getElementById('uploadZone').classList.remove('has-img');
+  document.getElementById('resultBlock').style.display = 'none';
+  document.getElementById('btnAnalyze').style.display = 'flex';
+  document.getElementById('btnAnalyze').disabled = true;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('errBox').style.display = 'none';
+  imageBase64 = null;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
